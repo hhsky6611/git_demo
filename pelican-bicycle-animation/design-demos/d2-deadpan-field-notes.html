@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>方向板 2 · 现实参照 · 死面瘫伪纪录片 × 野外图鉴注解</title>
+<!--
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  逻辑二 · 现实参照（标杆迁移）
+  参照案例：Google Chrome《Pelican Airlines》广告（Wieden+Kennedy，2013）——
+    「鹈鹕骑自行车」这个题材在流行文化里的正主。它的方法不是把画面做得花，
+    而是用**伪纪录片的冷静语气**去讲一个荒诞前提：固定机位、写实扁平、
+    一本正经的旁白字幕。
+  ⚠️ 该案例的年份/代理方为我的记忆，本会话 WebSearch 工具异常未能联网核实；
+    迁移的是**方法**（deadpan + 静态机位 + 克制扁平），不依赖这两个事实。
+  ⚠️ 不使用任何 Chrome / 第三方品牌标识，画面为原创角色。
+
+  与方向板 1 的骨架差异：本版是**横幅地平线构图**——主体偏右下、只占画面 62%，
+  上方 46% 全是雾色天空的负空间，文字以「图鉴注解」的形式竖排在左 1/4 栏，
+  用发丝引线指回主体（不是压在主视觉上的大标题）。
+
+  假设：A1 静态机位（笑点来自主体穿过画面，不是来自镜头花活）
+        A2 7.35s 无缝循环，曲柄 7 转，比第 1 版慢 —— 严肃感来自节奏
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-->
+<style>
+  :root{
+    --fog:#E7EBE6; --fog2:#DCE3E0; --slate:#93A6A4; --deep:#242B2A;
+    --bone:#F7F5EE; --sand:#D9CDB2; --eel:#5C7A5E; --bill:#E08A4E;
+    --buoy:#B84A2E;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#20262A}
+  body{font-family:"Iowan Old Style","Palatino","Songti SC",serif;color:var(--bone);padding:26px 0 44px}
+  #stage{position:relative;width:1920px;height:1080px;margin:0 auto;overflow:hidden;
+    background:var(--fog);transform-origin:top left}
+  #frame{display:block;width:1920px;height:1080px}
+  .overlay{position:absolute;inset:0;pointer-events:none}
+
+  /* 左栏：野外图鉴注解（发丝线 + mono 小字 = 科学记录的语气）*/
+  .guide{position:absolute;left:96px;top:150px;width:352px}
+  .guide .head{font-size:13px;letter-spacing:.34em;color:#6E7C7A;
+    font-family:"Menlo",monospace;border-bottom:1px solid #B9C4C0;padding-bottom:11px}
+  .guide h1{font-size:56px;line-height:1.14;font-weight:400;color:var(--deep);margin:24px 0 6px;
+    font-variant-numeric:oldstyle-nums}
+  .guide h1 em{display:block;font-style:italic;font-size:29px;color:#6E7C7A;margin-top:12px;letter-spacing:.01em}
+  .guide dl{margin-top:34px}
+  .guide dt{font-family:"Menlo",monospace;font-size:11.5px;letter-spacing:.2em;color:var(--buoy);margin-top:22px}
+  .guide dd{font-size:19.5px;line-height:1.62;color:#39423F;margin-top:6px}
+  .guide dd b{font-weight:600;color:var(--deep)}
+  .guide .foot{margin-top:38px;padding-top:13px;border-top:1px solid #B9C4C0;
+    font-family:"Menlo",monospace;font-size:11.5px;letter-spacing:.12em;color:#6E7C7A;line-height:1.9}
+  /* 引线（SVG 叠在画面上，指向主体的三个部位）*/
+  .leaders{position:absolute;inset:0;width:1920px;height:1080px}
+  .leaders line,.leaders path{stroke:var(--buoy);stroke-width:1;fill:none}
+  .leaders circle{fill:var(--buoy)}
+  .leaders text{font-family:"Menlo",monospace;font-size:15.5px;fill:var(--buoy);letter-spacing:.06em}
+
+  .chrome{margin:22px auto 0;width:1920px;display:grid;grid-template-columns:1fr auto;gap:26px;align-items:start}
+  .chrome h2{font-size:15px;letter-spacing:.28em;color:#8A9490;margin-bottom:12px;font-family:"Menlo",monospace}
+  .chrome p{font-size:19px;line-height:1.68;color:#DCDFD8;max-width:1180px}
+  .chrome p b{color:#fff}
+  .chrome .facts{font-family:"Menlo",monospace;font-size:14px;color:#93A09B;margin-top:12px;line-height:1.75}
+  .swatches{display:flex;border:1px solid #45504C}
+  .sw{width:66px;height:96px;position:relative}
+  .sw i{position:absolute;left:0;right:0;bottom:5px;text-align:center;font-style:normal;
+    font-family:"Menlo",monospace;font-size:9.5px;color:rgba(0,0,0,.6);letter-spacing:-.03em}
+  .sw.l i{color:rgba(255,255,255,.72)}
+</style>
+</head>
+<body>
+<div id="stage">
+<svg id="frame" viewBox="0 0 1920 1080" aria-label="鹈鹕骑自行车 · 图鉴方向板">
+<defs>
+  <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#EDEFE9"/><stop offset=".62" stop-color="#DDE4E1"/><stop offset="1" stop-color="#CBD6D3"/>
+  </linearGradient>
+  <linearGradient id="bodyShade" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#FBFAF5"/><stop offset="1" stop-color="#DCD8CB"/>
+  </linearGradient>
+  <linearGradient id="pouchG" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#E79B62"/><stop offset="1" stop-color="#C4652E"/>
+  </linearGradient>
+  <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+    <feDropShadow dx="0" dy="9" stdDeviation="9" flood-color="#2B3A38" flood-opacity=".2"/>
+  </filter>
+</defs>
+
+<!-- ══════ 后景 0.35×：防波堤 + 远山 + 同族第二只（编队，纵深用）══════ -->
+<rect width="1920" height="1080" fill="url(#sky)"/>
+<g id="far">
+  <path d="M0,706 L1920,706 L1920,742 L0,742 Z" fill="#C2CFCB"/>
+  <path d="M-40,706 q180,-58 372,-14 q206,46 402,-6 q232,-60 440,4 q140,38 348,16 L1920,742 L-40,742 Z" fill="#AFC0BC"/>
+  <g id="jetties" stroke="#8FA3A0" stroke-width="5"></g>
+  <g id="birds" opacity=".5"></g>
+</g>
+
+<!-- ══════ 中景 0.7×：沙丘草 + 路牌 + 栅栏 ══════ -->
+<g id="mid">
+  <path d="M0,742 L1920,742 L1920,880 L0,880 Z" fill="#D7D9C6"/>
+  <g id="grass"></g>
+</g>
+
+<!-- ══════ 前景 1.4×：柏油路缘 + 龟裂 + 草茎 ══════ -->
+<g id="near">
+  <rect x="0" y="880" width="1920" height="200" fill="#8C8F86"/>
+  <rect x="0" y="880" width="1920" height="7" fill="#6F736A"/>
+  <g id="cracks"></g>
+</g>
+
+<!-- ══════ 骑手 rig（写实比例：喙≈体长 1/3、S 颈、短腿全蹼、黑色翼尖）══════ -->
+<g id="rider">
+ <g id="rig" transform="translate(1210,556) scale(1.0) translate(-865,-530)">
+  <ellipse cx="880" cy="884" rx="300" ry="17" fill="#2B3A38" opacity=".16"/>
+
+  <!-- 远侧曲柄腿 -->
+  <g id="farLeg" opacity=".55">
+    <line id="farCrank" stroke="#3A4441" stroke-width="9" stroke-linecap="round"/>
+    <line id="fThigh" stroke="#3E4744" stroke-width="19" stroke-linecap="round"/>
+    <line id="fShin"  stroke="#3E4744" stroke-width="14" stroke-linecap="round"/>
+    <g id="fFoot"><path d="M0,-7 l44,-9 q11,3 9,14 l-6,17 q-3,7 -12,5 l-37,-10 Z" fill="#C98F52" stroke="#2C3330" stroke-width="4" stroke-linejoin="round"/>
+      <g stroke="#2C3330" stroke-width="2.4" opacity=".8"><line x1="8" y1="-3" x2="40" y2="-2"/><line x1="8" y1="4" x2="38" y2="7"/></g></g>
+  </g>
+
+  <!-- 自行车（写实公路车：700c 同径轮、下弯把、掉链罩、后货架）-->
+  <g id="bike">
+    <g id="wheelR">
+      <circle cx="700" cy="776" r="104" fill="none" stroke="#2C3330" stroke-width="9"/>
+      <circle cx="700" cy="776" r="93" fill="none" stroke="#C9CFC6" stroke-width="3"/>
+      <g id="spokesR" stroke="#98A19B" stroke-width="1.6"></g>
+      <circle cx="700" cy="776" r="7" fill="#4C544F"/>
+    </g>
+    <g id="wheelF">
+      <circle cx="1088" cy="776" r="104" fill="none" stroke="#2C3330" stroke-width="9"/>
+      <circle cx="1088" cy="776" r="93" fill="none" stroke="#C9CFC6" stroke-width="3"/>
+      <g id="spokesF" stroke="#98A19B" stroke-width="1.6"></g>
+      <circle cx="1088" cy="776" r="7" fill="#4C544F"/>
+    </g>
+    <path d="M700,760 L812,790 M700,792 L812,822" stroke="#6C756F" stroke-width="4"/>
+    <circle cx="700" cy="776" r="16" fill="none" stroke="#6C756F" stroke-width="4"/>
+    <g stroke="#4E5B57" stroke-width="11" stroke-linecap="round" fill="none">
+      <line x1="812" y1="806" x2="700" y2="776"/>
+      <line x1="812" y1="806" x2="748" y2="648"/>
+      <line x1="812" y1="806" x2="1046" y2="704"/>
+      <line x1="752" y1="652" x2="1030" y2="648"/>
+      <line x1="750" y1="646" x2="700" y2="776"/>
+    </g>
+    <line x1="1030" y1="646" x2="1052" y2="712" stroke="#4E5B57" stroke-width="13"/>
+    <path d="M1040,660 C1058,700 1074,740 1088,776" fill="none" stroke="#4E5B57" stroke-width="10"/>
+    <circle cx="812" cy="806" r="34" fill="none" stroke="#6C756F" stroke-width="4"/>
+    <circle cx="812" cy="806" r="9" fill="#4E5B57"/>
+    <path d="M712,646 q46,-12 78,4 q-8,16 -40,16 q-30,0 -38,-20 Z" fill="#3A4441"/>
+    <path d="M1030,640 q36,-6 52,14 q14,18 4,40" fill="none" stroke="#2C3330" stroke-width="9" stroke-linecap="round"/>
+    <path d="M1086,694 q22,10 30,32" fill="none" stroke="#2C3330" stroke-width="7" stroke-linecap="round"/>
+  </g>
+
+  <!-- 鹈鹕 -->
+  <g id="bird">
+    <!-- 尾（短）-->
+    <path d="M560,486 q-72,-16 -112,10 q40,44 118,44 Z" fill="#DCD8CB" stroke="#2C3330" stroke-width="4"/>
+    <!-- 身体：桶状重身 -->
+    <path d="M548,470 q24,-134 176,-152 q158,-18 216,96 q48,98 -22,176 q-74,82 -196,68 q-140,-16 -174,-188 Z"
+          fill="url(#bodyShade)" stroke="#2C3330" stroke-width="5"/>
+    <!-- 覆羽分层（3 条弧线 = 「有羽毛」而不是「有个身子」）-->
+    <g fill="none" stroke="#B7B2A2" stroke-width="3.4" opacity=".9">
+      <path d="M604,404 q96,-40 210,-22"/><path d="M588,470 q104,-32 226,-8"/><path d="M600,540 q98,-20 202,4"/>
+    </g>
+    <!-- 黑色初级飞羽（白鹈鹕的识别块）-->
+    <path d="M556,436 q-44,60 -30,128 q30,44 96,50 q-40,-52 -34,-116 q4,-48 -32,-62 Z" fill="#343936"/>
+    <g fill="none" stroke="#535A56" stroke-width="3"><path d="M540,478 q22,36 20,84"/><path d="M568,466 q20,44 16,96"/></g>
+    <!-- 颈：S 形收缩（不是鹭的直颈）-->
+    <path d="M846,392 C862,300 906,244 972,222 l54,58 C972,300 944,342 934,420 Z"
+          fill="#F4F1E8" stroke="#2C3330" stroke-width="5"/>
+    <path d="M872,384 C888,304 924,254 976,232" fill="none" stroke="#C6C1B1" stroke-width="3.4"/>
+    <!-- 头颈组：单独 counter-bob -->
+    <g id="headG">
+      <circle cx="996" cy="272" r="46" fill="#F7F5EE" stroke="#2C3330" stroke-width="5"/>
+      <path d="M968,232 q30,-26 62,-8 q-26,10 -36,26 Z" fill="#DCD8CB"/>
+      <!-- 眼 + 眼下裸皮 -->
+      <ellipse cx="1014" cy="258" rx="14" ry="15" fill="#3A2E22"/>
+      <circle cx="1018" cy="253" r="4" fill="#F7F5EE" opacity=".85"/>
+      <path d="M996,272 q22,10 40,4" fill="none" stroke="#C98F52" stroke-width="5" opacity=".8"/>
+      <!-- 上喙：长、直、尖端有钩 -->
+      <path d="M1036,254 L1268,318 q10,4 4,12 l-14,10 L1032,286 Z" fill="#E08A4E" stroke="#2C3330" stroke-width="4.5" stroke-linejoin="round"/>
+      <path d="M1256,316 l18,7 l-11,15 Z" fill="#8C5A2C"/>
+      <path d="M1044,266 L1244,322" fill="none" stroke="#F2B483" stroke-width="3" opacity=".8"/>
+      <!-- 喉囊：全片唯一的柔性体，带滞后 -->
+      <g id="pouchG">
+        <path d="M1034,284 C1040,398 1132,436 1236,342 L1246,330 L1036,290 Z"
+              fill="url(#pouchG)" stroke="#2C3330" stroke-width="4.5" stroke-linejoin="round"/>
+        <path d="M1060,326 q74,66 156,10" fill="none" stroke="#A95C24" stroke-width="3" opacity=".55"/>
+        <g id="fish" opacity="0"><path d="M1206,352 l40,-20 l-6,44 l26,16 l-48,6 Z" fill="#9FB4A8" stroke="#2C3330" stroke-width="3"/></g>
+      </g>
+    </g>
+    <!-- 翅：握把 -->
+    <path id="wing" d="M852,404 C918,424 1000,510 1052,608 l30,34 q-46,10 -84,-30 C950,558 890,486 838,446 Z"
+          fill="#EFEBE0" stroke="#2C3330" stroke-width="5" stroke-linejoin="round"/>
+    <g fill="none" stroke="#B7B2A2" stroke-width="3.2" opacity=".95">
+      <path d="M906,452 q22,26 26,52"/><path d="M950,498 q22,26 26,52"/><path d="M994,546 q20,24 24,48"/>
+    </g>
+    <!-- 近侧腿：短腿 + 全蹼，几乎不折踝 -->
+    <g id="nearLeg">
+      <line id="nThigh" stroke="#4C544F" stroke-width="21" stroke-linecap="round"/>
+      <line id="nShin"  stroke="#4C544F" stroke-width="16" stroke-linecap="round"/>
+      <g id="nFoot">
+        <path d="M0,-7 l48,-10 q12,3 10,15 l-7,19 q-3,7 -12,5 l-41,-11 Z" fill="#D79A5C" stroke="#2C3330" stroke-width="4.5" stroke-linejoin="round"/>
+        <g stroke="#2C3330" stroke-width="2.6" opacity=".85"><line x1="10" y1="-3" x2="45" y2="-3"/><line x1="10" y1="5" x2="43" y2="8"/><line x1="9" y1="12" x2="38" y2="15"/></g>
+      </g>
+    </g>
+    <line id="nearCrank" stroke="#2C3330" stroke-width="9" stroke-linecap="round"/>
+    <g id="nearPedal"><rect x="-21" y="-6" width="42" height="12" rx="2" fill="#3A4441"/></g>
+  </g>
+ </g>
+</g>
+
+<!-- 图鉴引线的终端圆点随主体一起呼吸，故放在 overlay svg 里做静态锚点 -->
+</svg>
+
+<svg class="overlay leaders" viewBox="0 0 1920 1080" style="pointer-events:none"><g id="leadG">
+  <!-- 两条引线，不是三条：律一「≤3 活跃元素」，第三条改为写进左栏正文 -->
+  <path d="M1856,572 L1566,524 L1494,414"/><circle cx="1494" cy="414" r="3.5"/>
+  <text x="1856" y="600" text-anchor="end">GULAR POUCH · 13 L</text>
+  <path d="M452,596 L716,596 L938,556"/><circle cx="938" cy="556" r="3.5"/>
+  <text x="452" y="586">PRIMARIES MELANIC</text>
+</g></svg>
+
+<div class="overlay">
+  <div class="guide">
+    <div class="head">FIELD NOTES · NO. 04</div>
+    <h1>鹈鹕<em>Pelecanus erythrorhynchos</em></h1>
+    <dl>
+      <dt>MOVEMENT</dt><dd>步态笨拙，<b>陆地上几乎不会走路</b>；一旦上车，反倒比步行合理。</dd>
+      <dt>NOTES</dt><dd>喉囊兼作货舱。<b>四趾全向前、全蹼相连</b>——踩得稳，但几乎不会蹬。</dd>
+    </dl>
+    <div class="foot">OBS. 06:12 · TIDE FALLING<br>机位固定 · 主体穿越画面</div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════ 看板 chrome（不属于成片画面）═══════ -->
+<div class="chrome no-record">
+  <div>
+    <h2>方向板 2 · 逻辑二「现实参照」</h2>
+    <p>
+      <b>参照</b>：Chrome《Pelican Airlines》的<b>伪纪录片语气</b>（非借用其标识，画面全原创）。
+      <b>气质</b>：荒诞前提 × 冷静执行。没有一个大字标题、没有撞色、没有弹跳——
+      镜头是死的，只有一张野外图鉴在<b>一本正经地记录一件不正常的事</b>。
+      <b>form 来自内容</b>：这个题材最好笑的不是「鸟骑车」，是「有人在旁边认真地做笔记」——
+      所以画面主角是<b>注解与引线的语气</b>，鹈鹕只是被记录的对象。
+    </p>
+    <p class="facts">
+      骨架与第 1 版互异：横幅地平线 + 主体偏右下 62% + 上方 46% 天空负空间 + 文字竖排左栏（非压顶大字）。<br>
+      色彩采样：海岸图鉴印刷的雾青/沙/鳗草绿，唯一暖色是喙的橙（内容自带的生物色），浮标红只做发丝线。<br>
+      写实细节：S 形收缩颈（非鹭的直颈）、四趾全前全蹼、黑色初级飞羽、上喙端钩、BB 低于轮毂 30px、曲柄 76 使腿部近全伸。<br>
+      循环 7.35s · 曲柄 7 转 · 视差 0.35/0.7/1.4（层间比 ≥2 可辨）· 轮地与曲柄按齿比严格耦合。
+    </p>
+  </div>
+  <div class="swatches">
+    <div class="sw" style="background:#E7EBE6"><i>E7EBE6</i></div>
+    <div class="sw" style="background:#CBD6D3"><i>CBD6D3</i></div>
+    <div class="sw" style="background:#93A6A4"><i>93A6A4</i></div>
+    <div class="sw" style="background:#D9CDB2"><i>D9CDB2</i></div>
+    <div class="sw" style="background:#5C7A5E"><i class="l">5C7A5E</i></div>
+    <div class="sw" style="background:#E08A4E"><i>E08A4E</i></div>
+    <div class="sw" style="background:#B84A2E"><i class="l">B84A2E</i></div>
+    <div class="sw" style="background:#242B2A"><i class="l">242B2A</i></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+let time = 0, playing = false, lastTick = null;
+
+const R=104, HUBR={x:700,y:776}, HUBF={x:1088,y:776};
+const BB={x:812,y:806}, CR=76;
+const HIP={x:770,y:626}, L1=128, L2=134;   // 262 > 最远 260.8 → 脚恒贴脚踏，不穿帮
+const CADENCE=1.05, REVS=7, GEAR=1.24, DUR=CADENCE*REVS;
+const ARC_PS = 2*Math.PI*R*GEAR/CADENCE;
+
+const $=id=>document.getElementById(id), NS='http://www.w3.org/2000/svg';
+function mk(t,a){const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);return n;}
+
+/* 轮辐 18 根 */
+[['spokesR',HUBR],['spokesF',HUBF]].forEach(([g,c])=>{
+  const el=$(g);
+  for(let i=0;i<18;i++){const a=i/18*Math.PI*2;
+    el.appendChild(mk('line',{x1:c.x+8*Math.cos(a),y1:c.y+8*Math.sin(a),x2:c.x+92*Math.cos(a),y2:c.y+92*Math.sin(a)}));}
+});
+/* ── 视差平铺器：先由「一个循环的总位移」反推 tile 宽度 w，再按 w 生成内容 ──
+   （旧写法是先生成固定宽内容、再按算出的 w 克隆；当 w < 内容宽时克隆层互相重叠，
+     远景会长成鬼影墙。把顺序反过来：内容永远刚好铺满一个 tile）*/
+function tileLayer(id, layerSpeed, targetW, gen){
+  const total = ARC_PS*DUR*layerSpeed;
+  const n = Math.max(1, Math.round(total/targetW)), w = total/n;
+  const g = $(id); g.textContent = '';
+  const proto = []; gen(w, proto);
+  proto.forEach(el=>g.appendChild(el));
+  for(let c=1;c<=Math.ceil(1920/w)+1;c++) proto.forEach(el=>{
+    const cl = el.cloneNode(true); cl.setAttribute('transform',`translate(${c*w},0)`); g.appendChild(cl);});
+  return {g,w,layerSpeed};
+}
+const fr = i => { const x = Math.sin(i*127.1+311.7)*43758.5453; return x-Math.floor(x); };
+const TL=[
+  /* 后景 0.35×：防波堤木桩 + 编队的同类（纵深，不是活跃元素）*/
+  tileLayer('jetties',0.35,460,(w,out)=>{for(let k=0;k<3;k++){const x=(k+.25)/3*w;
+    out.push(mk('path',{d:`M${x},712 l2,-64 M${x+2},656 l26,-12 M${x+2},668 l22,-11`}));}}),
+  tileLayer('birds',0.35,820,(w,out)=>{for(let k=0;k<2;k++){const x=(k+.12)/2*w,y=168+fr(k)*86;
+    out.push(mk('path',{fill:'#7F918E',d:`M${x},${y} q22,-16 44,0 q-22,-4 -44,8 M${x+44},${y} q22,-16 44,0 q-22,-4 -44,8`}));}}),
+  /* 中景 0.7×：鳗草丛 */
+  tileLayer('grass',0.7,300,(w,out)=>{for(let k=0;k<4;k++){const x=(k+fr(k)*.55)/4*w,h=26+fr(k+9)*38;
+    out.push(mk('path',{fill:'none',stroke:'#7C9579','stroke-width':3,
+      d:`M${x},748 q6,${-h} 20,${-h-8} M${x+12},748 q-2,${-h+6} -14,${-h-2} M${x+24},748 q10,${-h} 24,${-h+6}`}));}}),
+  /* 前景 1.4×：龟裂 + 补丁 + 胎痕 */
+  tileLayer('cracks',1.4,300,(w,out)=>{
+    out.push(mk('path',{fill:'none',stroke:'#7A7E75','stroke-width':2.4,opacity:.85,
+      d:`M${w*.08},940 l34,10 l26,-6 l30,14 M${w*.3},950 l6,26`}));
+    out.push(mk('ellipse',{cx:w*.62,cy:932,rx:54,ry:9,fill:'#7E827A',opacity:.45}));
+    out.push(mk('rect',{x:w*.74,y:1000,width:w*.17,height:30,fill:'#82867C',opacity:.5}));}),
+];
+
+function ik(hx,hy,fx,fy,l1,l2){
+  let dx=fx-hx,dy=fy-hy,d=Math.hypot(dx,dy);
+  const mx=l1+l2-.5,mn=Math.abs(l1-l2)+.5;
+  if(d>mx){const k=mx/d;fx=hx+dx*k;fy=hy+dy*k;d=mx;} else if(d<mn){d=mn;}
+  const a=Math.atan2(dy,dx),A=Math.acos(Math.max(-1,Math.min(1,(l1*l1+d*d-l2*l2)/(2*l1*d))));
+  const ka=a-A;                                  // 膝向画面前方顶
+  return {kx:hx+l1*Math.cos(ka),ky:hy+l1*Math.sin(ka),fx,fy};
+}
+function setLine(e,x1,y1,x2,y2){e.setAttribute('x1',x1);e.setAttribute('y1',y1);e.setAttribute('x2',x2);e.setAttribute('y2',y2);}
+function leg(th,sh,ft,ped,cr,ang){
+  const fx=BB.x+CR*Math.cos(ang), fy=BB.y+CR*Math.sin(ang);
+  const s=ik(HIP.x,HIP.y,fx,fy,L1,L2);
+  if(th) setLine(th,HIP.x,HIP.y,s.kx,s.ky);
+  if(sh) setLine(sh,s.kx,s.ky,fx,fy);
+  ft.setAttribute('transform',`translate(${fx},${fy-9}) rotate(${-6+8*Math.sin(ang)})`);
+  if(ped) ped.setAttribute('transform',`translate(${fx},${fy+9})`);
+  if(cr) setLine(cr,BB.x,BB.y,fx,fy);
+}
+function render(t){
+  const th=(t/CADENCE)*2*Math.PI, wa=th*GEAR*180/Math.PI;
+  $('wheelR').setAttribute('transform',`rotate(${wa} ${HUBR.x} ${HUBR.y})`);
+  $('wheelF').setAttribute('transform',`rotate(${wa} ${HUBF.x} ${HUBF.y})`);
+  leg($('nThigh'),$('nShin'),$('nFoot'),$('nearPedal'),$('nearCrank'),th);
+  leg($('fThigh'),$('fShin'),$('fFoot'),null,$('farCrank'),th+Math.PI);
+
+  /* 死面瘫：机位完全静止，主体只做极小的生理起伏（幅度约为第 1 版的 1/3）*/
+  const bx=3.2*Math.sin(th), by=-4*Math.sin(2*th);
+  $('rig').setAttribute('transform',`translate(${1210+bx},${556+by}) scale(1) translate(-865,-530)`);
+  /* 图鉴引线锚点跟着主体一起呼吸，否则一动就露出「标注没对准」的假 */
+  $('leadG').setAttribute('transform',`translate(${bx},${by})`);
+  $('headG').setAttribute('transform',`translate(${1.6*Math.sin(th+.6)},${-4.4*Math.sin(2*th+.5)})`);
+  $('pouchG').setAttribute('transform',`translate(${2*Math.sin(th-2.2)},${5.4*Math.sin(th-2.0)}) rotate(${1.1*Math.sin(th-2.4)} 1034,286)`);
+
+  /* 三层视差（0.35 / 0.7 / 1.4，层间比 ≥2 才可辨）*/
+  const d=t*ARC_PS;
+  TL.forEach(o=>o.g.setAttribute('transform',`translate(${-(d*o.layerSpeed)%o.w},0)`));
+}
+function tick(now){
+  if(lastTick===null){lastTick=now;window.__ready=true;render(0);requestAnimationFrame(tick);return;}
+  const dt=(now-lastTick)/1000;lastTick=now;
+  if(playing){let t=time+dt;if(t>=DUR)t=window.__recording?DUR-.001:0;time=t;render(time);}
+  requestAnimationFrame(tick);
+}
+document.fonts.ready.then(()=>{ render(0); playing=true; requestAnimationFrame(tick); });
+window.__seek=t=>{time=t;render(t);};window.__pause=()=>{playing=false;};window.__duration=DUR;
+</script>
+</body>
+</html>

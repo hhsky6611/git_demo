@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>方向板 1 · 秒数轮盘 · 孟菲斯复古拼贴最大化</title>
+<!--
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  逻辑一 · 秒数轮盘：date +%S = 22 → 22 % 20 + 1 = 第 3 号
+  → design-styles.md 网页 20 种 ·「孟菲斯复古拼贴最大化」(大胆·还原 72%)
+  参考：Ettore Sottsass 的 Memphis Group（1981-1987）家具与平面设计
+
+  假设（用户未澄清，按 best judgment 补齐）：
+  A1 单镜头无缝循环 6s，1920×1080
+  A2 无解说、无文字旁白；画面内只有一个标题级大字组（题材需要荒诞的「产品感」）
+  A3 降级声明：Memphis 的真实做旧纹理/印刷颗粒 CSS 做不出来（还原度 72%），
+     降级为纯色块 + 网点 pattern + mix-blend-mode，不假装做出原版肌理
+  A4 律一「同屏活跃元素 ≤3」与孟菲斯「最大化」本质冲突 →
+     处理方式：把混乱留在静止的背景层（降饱和、不运动），运动预算只给
+     骑手 / 路面虚线 / 前景三角 三个通道
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-->
+<style>
+  :root{
+    --paper:#EADFC4; --cream:#F6F1E2; --ink:#1C1B19;
+    --red:#C0392B; --mustard:#D8A72A; --cobalt:#2E5FA3;
+    --olive:#6E7B3F; --violet:#7A5C9E; --orange:#E2703A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#26241F}
+  body{
+    font-family:"Futura","Century Gothic","Hiragino Sans GB","STHeiti",sans-serif;
+    color:var(--cream);
+    padding:26px 0 44px;
+  }
+  .board{width:1920px;margin:0 auto;position:relative}
+  /* stage 必须是 relative —— 所有 absolute 子元素的坐标系锚点 */
+  #stage{position:relative;width:1920px;height:1080px;overflow:hidden;
+    background:var(--paper);transform-origin:top left}
+  #frame{display:block;width:1920px;height:1080px}
+
+  .overlay{position:absolute;inset:0;pointer-events:none}
+  h1{position:absolute;left:58px;top:236px;line-height:.82}
+  .latin{font-size:120px;font-weight:700;letter-spacing:-.015em;color:var(--ink);
+    display:block;position:relative}
+  .latin b{position:relative;z-index:2}
+  .latin span{position:absolute;left:-18px;top:26px;width:660px;height:88px;
+    background:var(--cobalt);z-index:1;transform:rotate(-1.6deg);
+    mix-blend-mode:multiply;opacity:.92}
+  .cjk{font-family:"Songti SC","Hiragino Sans GB",serif;font-weight:900;
+    font-size:196px;letter-spacing:.02em;color:var(--ink);display:block;
+    transform:rotate(-3.4deg);position:relative;margin-top:14px}
+  .cjk i{position:relative;z-index:2;font-style:normal}
+  .cjk em{position:absolute;z-index:1;font-style:normal;background:var(--mustard);
+    width:412px;height:126px;left:384px;top:56px;transform:rotate(2.6deg);
+    mix-blend-mode:multiply}
+  .kicker{position:absolute;left:64px;top:132px;font-size:22px;letter-spacing:.4em;
+    color:#8D8676;font-weight:700;font-family:"Menlo",monospace}
+  .note{position:absolute;left:60px;top:686px;font-size:20px;line-height:1.5;
+    color:var(--ink);width:332px;font-family:"Songti SC","Hiragino Sans GB",serif;
+    background:#F6F1E2;border:3px solid var(--ink);padding:16px 18px;
+    box-shadow:9px 9px 0 var(--ink);transform:rotate(-1.1deg)}
+  .note strong{color:var(--red);font-family:"Menlo",monospace;font-size:14px;
+    letter-spacing:.2em;display:block;margin-bottom:7px}
+
+  /* ── 以下为看板 chrome，不属于成片画面（导出时 .no-record 隐藏）── */
+  .chrome{margin:22px auto 0;width:1920px;display:grid;
+    grid-template-columns:1fr auto;gap:26px;align-items:start}
+  .chrome h2{font-size:15px;letter-spacing:.28em;color:#8D8676;margin-bottom:12px}
+  .chrome p{font-size:19px;line-height:1.66;color:#DED6C2;max-width:1180px}
+  .chrome p b{color:#F6F1E2}
+  .chrome .facts{font-family:"Menlo",monospace;font-size:14px;color:#9A9282;
+    margin-top:12px;letter-spacing:-.01em}
+  .swatches{display:flex;gap:0;border:2px solid #4A463C}
+  .sw{width:66px;height:96px;position:relative}
+  .sw i{position:absolute;left:0;right:0;bottom:5px;text-align:center;font-style:normal;
+    font-family:"Menlo",monospace;font-size:9.5px;color:rgba(0,0,0,.62);letter-spacing:-.03em}
+  .sw.light i{color:rgba(255,255,255,.72)}
+</style>
+</head>
+<body>
+<div class="board">
+<div id="stage">
+<svg id="frame" viewBox="0 0 1920 1080" aria-label="鹈鹕骑自行车 · 孟菲斯方向板">
+<defs>
+  <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
+    <circle cx="7" cy="7" r="4.4" fill="#F6F1E2" opacity=".55"/>
+  </pattern>
+  <pattern id="dotsInk" width="22" height="22" patternUnits="userSpaceOnUse">
+    <circle cx="6" cy="6" r="3.2" fill="#1C1B19" opacity=".3"/>
+  </pattern>
+  <pattern id="stripe" width="24" height="24" patternUnits="userSpaceOnUse" patternTransform="rotate(-16)">
+    <rect width="9" height="24" fill="#1C1B19" opacity=".2"/>
+  </pattern>
+  <filter id="hardShadow" x="-25%" y="-25%" width="165%" height="165%" color-interpolation-filters="sRGB">
+    <feFlood flood-color="#3A2F66" flood-opacity=".95" result="c"/>
+    <feComposite in="c" in2="SourceAlpha" operator="in" result="sil"/>
+    <feOffset in="sil" dx="15" dy="15" result="silo"/>
+    <feMerge><feMergeNode in="silo"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <clipPath id="pouchClip"><path id="pouchShape" d="M1058,288 C1062,418 1178,470 1272,336 L1272,336 L1058,296 Z"/></clipPath>
+</defs>
+
+<!-- ══════ 背景层：Memphis 撞色块（静止混乱，运动预算为 0）══════ -->
+<g id="bg">
+  <rect width="1920" height="1080" fill="#EADFC4"/>
+  <rect width="1920" height="1080" fill="url(#dotsInk)"/>
+  <!-- 钴蓝大色块 -->
+  <g transform="rotate(-6.5 300 430)"><rect x="-260" y="120" width="700" height="640" fill="#2E5FA3"/></g>
+  <!-- 芥末四分之一圆（右上）-->
+  <path d="M1920,0 L1920,470 A470,470 0 0 0 1450,0 Z" fill="#D8A72A" opacity=".95"/>
+  <!-- 同心拱（Memphis "Carlton" 母题）-->
+  <g id="arches">
+    <path d="M640,958 A320,320 0 0 1 1280,958" fill="none" stroke="#7A5C9E" stroke-width="34"/>
+    <path d="M706,958 A254,254 0 0 1 1214,958" fill="none" stroke="#C0392B" stroke-width="26"/>
+    <path d="M772,958 A188,188 0 0 1 1148,958" fill="none" stroke="#6E7B3F" stroke-width="20"/>
+  </g>
+  <g id="squiggle"><path d="M1520,700 q40,-52 80,0 t80,0 t80,0 t80,0" fill="none" stroke="#7A5C9E" stroke-width="19" stroke-linecap="round"/></g>
+  <g transform="rotate(11 1660 176)"><rect x="1546" y="128" width="228" height="96" fill="#C0392B"/><rect x="1546" y="128" width="228" height="96" fill="url(#dots)"/></g>
+  <circle cx="1452" cy="866" r="62" fill="#F6F1E2" stroke="#1C1B19" stroke-width="9"/>
+  <path d="M392,772 l58,-102 l58,102 Z" fill="#1C1B19"/>
+  <path d="M1786,600 l46,-82 l46,82 Z" fill="#6E7B3F"/>
+  <g transform="rotate(-24 214 946)"><rect x="60" y="900" width="330" height="44" fill="#E2703A"/></g>
+  <!-- 背景波浪线（自由漂浮）-->
+  <path d="M60,196 q34,-40 68,0 t68,0" fill="none" stroke="#1C1B19" stroke-width="7" opacity=".45"/>
+</g>
+
+<!-- ══════ 路面中景（tile 宽度由总位移反推，保证无缝）══════ -->
+<g id="road">
+  <rect x="0" y="958" width="1920" height="122" fill="#C0392B"/>
+  <g id="roadDashes"></g>
+</g>
+<!-- ══════ 前景层（1.625× 速度）══════ -->
+<g id="fg">
+  <rect x="0" y="1044" width="1920" height="36" fill="#1C1B19"/>
+  <g id="fgTris"></g>
+</g>
+
+<!-- ══════ 骑手：鹈鹕 + 自行车（rig 坐标系 430..1300 / 175..885）══════ -->
+<g id="rider">
+ <g id="rigScale" filter="url(#hardShadow)">
+  <g id="rig" transform="translate(1140,587) scale(1.06) translate(-865,-530)">
+
+   <!-- 远侧曲柄 + 远侧腿（在车架之后、被压暗）-->
+   <g id="farLeg" opacity=".62">
+     <line id="farCrank" x1="818" y1="800" x2="888" y2="800" stroke="#1C1B19" stroke-width="13" stroke-linecap="round"/>
+     <line id="fThigh" x1="790" y1="640" x2="880" y2="690" stroke="#1C1B19" stroke-width="26" stroke-linecap="round"/>
+     <line id="fShin"   x1="880" y1="690" x2="888" y2="800" stroke="#1C1B19" stroke-width="19" stroke-linecap="round"/>
+     <g id="fFoot"><path d="M0,0 l54,-10 l6,34 l-52,6 Z" fill="#6E7B3F" stroke="#1C1B19" stroke-width="6" stroke-linejoin="round"/></g>
+   </g>
+
+   <!-- 自行车 -->
+   <g id="bike">
+     <g id="wheelR">
+       <circle cx="690" cy="770" r="110" fill="none" stroke="#1C1B19" stroke-width="15"/>
+       <circle cx="690" cy="770" r="92" fill="none" stroke="#D8A72A" stroke-width="7" stroke-dasharray="13 15"/>
+       <g stroke="#1C1B19" stroke-width="5">
+         <line x1="690" y1="678" x2="690" y2="862"/><line x1="598" y1="770" x2="782" y2="770"/>
+         <line x1="625" y1="705" x2="755" y2="835"/><line x1="755" y1="705" x2="625" y2="835"/>
+         <line x1="648" y1="683" x2="732" y2="857" opacity="0"/>
+       </g>
+     </g>
+     <g id="wheelF">
+       <circle cx="1075" cy="770" r="110" fill="none" stroke="#1C1B19" stroke-width="15"/>
+       <circle cx="1075" cy="770" r="92" fill="none" stroke="#D8A72A" stroke-width="7" stroke-dasharray="13 15"/>
+       <g stroke="#1C1B19" stroke-width="5">
+         <line x1="1075" y1="678" x2="1075" y2="862"/><line x1="983" y1="770" x2="1167" y2="770"/>
+         <line x1="1010" y1="705" x2="1140" y2="835"/><line x1="1140" y1="705" x2="1010" y2="835"/>
+       </g>
+     </g>
+     <!-- 链条 -->
+     <line x1="690" y1="752" x2="818" y2="782" stroke="#1C1B19" stroke-width="7"/>
+     <line x1="690" y1="788" x2="818" y2="818" stroke="#1C1B19" stroke-width="7"/>
+     <circle cx="690" cy="770" r="19" fill="#D8A72A" stroke="#1C1B19" stroke-width="6"/>
+     <!-- 车架 -->
+     <g stroke="#C0392B" stroke-width="15" stroke-linecap="round" fill="none">
+       <line x1="818" y1="800" x2="690" y2="770"/>
+       <line x1="818" y1="800" x2="770" y2="660"/>
+       <line x1="818" y1="800" x2="1046" y2="700"/>
+       <line x1="775" y1="660" x2="1030" y2="656"/>
+       <line x1="772" y1="655" x2="690" y2="770"/>
+       <line x1="1030" y1="650" x2="1075" y2="770"/>
+     </g>
+     <line x1="1028" y1="648" x2="1048" y2="712" stroke="#1C1B19" stroke-width="17" stroke-linecap="round"/>
+     <circle cx="818" cy="800" r="40" fill="#D8A72A" stroke="#1C1B19" stroke-width="8"/>
+     <circle cx="818" cy="800" r="12" fill="#1C1B19"/>
+     <!-- 座 + 把 -->
+     <path d="M714,652 l104,-8 l4,20 l-108,4 Z" fill="#7A5C9E" stroke="#1C1B19" stroke-width="7" stroke-linejoin="round"/>
+     <path d="M1032,644 l64,-26" stroke="#1C1B19" stroke-width="13" stroke-linecap="round"/>
+     <path d="M1092,612 q34,-4 36,26 q2,26 -26,28" fill="none" stroke="#1C1B19" stroke-width="14" stroke-linecap="round"/>
+   </g>
+
+   <!-- 鹈鹕 -->
+   <g id="bird">
+     <!-- 尾 -->
+     <path d="M548,458 L392,398 L410,478 L384,516 L552,520 Z" fill="#F6F1E2" stroke="#1C1B19" stroke-width="7" stroke-linejoin="round"/>
+     <path d="M446,428 l92,40 M436,470 l108,30" stroke="#1C1B19" stroke-width="5"/>
+     <!-- 身体 -->
+     <ellipse cx="700" cy="505" rx="172" ry="150" fill="#F6F1E2" stroke="#1C1B19" stroke-width="8"/>
+     <!-- 黑翼尖（白鹈鹕最强识别块）-->
+     <path d="M572,404 q-46,44 -40,110 q52,22 108,-4 q-22,-68 -68,-106 Z" fill="#1C1B19"/>
+     <circle cx="836" cy="420" r="40" fill="#E2703A"/>
+    <circle cx="836" cy="420" r="40" fill="none" stroke="#1C1B19" stroke-width="7"/>
+     <!-- 颈 -->
+     <path d="M806,452 C812,352 892,272 992,232 l58,74 C972,336 926,392 906,472 Z"
+           fill="#F6F1E2" stroke="#1C1B19" stroke-width="8" stroke-linejoin="round"/>
+     <!-- 头（随 bob 单独动）-->
+     <g id="headG">
+       <path d="M974,196 l34,-46 l22,48 Z" fill="#D8A72A" stroke="#1C1B19" stroke-width="6" stroke-linejoin="round"/>
+       <circle cx="1002" cy="250" r="62" fill="#F6F1E2" stroke="#1C1B19" stroke-width="8"/>
+       <circle cx="1024" cy="234" r="23" fill="#1C1B19"/>
+       <circle cx="1031" cy="227" r="7" fill="#F6F1E2"/>
+       <circle cx="1024" cy="234" r="31" fill="none" stroke="#D8A72A" stroke-width="6"/>
+       <!-- 上喙 -->
+       <path d="M1052,232 L1300,316 L1296,342 L1050,286 Z" fill="#D8A72A" stroke="#1C1B19" stroke-width="7" stroke-linejoin="round"/>
+       <path d="M1286,312 l24,10 l-16,22 Z" fill="#1C1B19"/>
+       <!-- 喉囊：柔性滞后体 = 视觉母题 -->
+       <g id="pouchG">
+         <path d="M1058,288 C1062,418 1178,470 1272,336 L1272,336 L1058,296 Z" fill="#C0392B" stroke="#1C1B19" stroke-width="7" stroke-linejoin="round"/>
+         <g clip-path="url(#pouchClip)"><rect x="1040" y="280" width="260" height="210" fill="url(#dots)"/></g>
+         <!-- 囊里的鱼：尾巴露在外面 -->
+         <g id="fish"><path d="M1214,392 l52,-26 l-8,58 l34,20 l-64,8 Z" fill="#F6F1E2" stroke="#1C1B19" stroke-width="6" stroke-linejoin="round"/></g>
+       </g>
+     </g>
+     <!-- 围巾（滞后波动）-->
+     <path id="scarfKnot" d="M872,332 l52,-22 l16,40 l-56,18 Z" fill="#D8A72A" stroke="#1C1B19" stroke-width="6" stroke-linejoin="round"/>
+   <path id="scarf" d="M902,300 q-70,10 -140,-14" fill="none" stroke="#D8A72A" stroke-width="17" stroke-linecap="round"/>
+     <path id="scarf2" d="M902,300 q-64,30 -126,32" fill="none" stroke="#C0392B" stroke-width="11" stroke-linecap="round" opacity=".95"/>
+     <!-- 翅（压把）-->
+     <g id="wing">
+       <path d="M812,436 L1074,596 L1098,640 L846,506 Z" fill="#2E5FA3" stroke="#1C1B19" stroke-width="8" stroke-linejoin="round"/>
+       <g stroke="#F6F1E2" stroke-width="6" opacity=".85">
+         <line x1="890" y1="482" x2="928" y2="508"/><line x1="948" y1="514" x2="988" y2="542"/><line x1="1006" y1="548" x2="1046" y2="576"/>
+       </g>
+     </g>
+     <!-- 近侧腿（IK 驱动）-->
+     <g id="nearLeg">
+       <line id="nThigh" x1="790" y1="640" x2="880" y2="690" stroke="#1C1B19" stroke-width="30" stroke-linecap="round"/>
+       <line id="nShin"  x1="880" y1="690" x2="888" y2="800" stroke="#1C1B19" stroke-width="22" stroke-linecap="round"/>
+       <circle id="nAnkle" cx="888" cy="800" r="12" fill="#D8A72A" stroke="#1C1B19" stroke-width="5"/>
+       <g id="nFoot"><path d="M0,0 l58,-12 l8,36 l-56,8 Z" fill="#D8A72A" stroke="#1C1B19" stroke-width="7" stroke-linejoin="round"/></g>
+     </g>
+     <!-- 近侧曲柄 + 脚踏 -->
+     <line id="nearCrank" x1="818" y1="800" x2="748" y2="800" stroke="#1C1B19" stroke-width="13" stroke-linecap="round"/>
+     <g id="nearPedal"><rect x="-24" y="-8" width="48" height="16" fill="#7A5C9E" stroke="#1C1B19" stroke-width="5"/></g>
+   </g>
+  </g>
+ </g>
+</g>
+
+<!-- 速度线：Memphis 的「动感符号」-->
+<g id="speed"></g>
+</svg>
+
+<div class="overlay">
+  <h1>
+    <span class="latin"><span></span><b>PELICAN</b></span>
+    <span class="cjk"><em></em><i>鹈鹕</i><i>快递</i></span>
+  </h1>
+  <p class="note"><strong>FORM ▸</strong> 来自内容的哪里：喉囊被画成一只装满货的帆布袋（红底白点），
+  车架改成低跨式——因为鹈鹕的腿太短，正常车架它根本够不着脚踏。</p>
+</div>
+</div>
+
+<!-- ═══════ 看板 chrome（不属于成片画面）═══════ -->
+<div class="chrome no-record">
+  <div>
+    <h2>方向板 1 · 逻辑一「秒数轮盘」</h2>
+    <p>
+      <b>风格</b>：孟菲斯复古拼贴最大化（design-styles.md 网页库 22 秒 → 第 3 号 · 大胆 · 还原度 72%）·
+      <b>参照</b>：Ettore Sottsass 的 Memphis Group（1981-87）家具与平面。
+      <b>气质</b>：把「鹈鹕蹬车」当成一件 80 年代的后现代家居产品来发布——荒诞前提配上货架式的自信。
+      撞色块、错位叠压、粗黑描边、网点印刷；刻意不和谐，靠骑手这一处的力学正确性把画面钉住。
+    </p>
+    <p class="facts">
+      降级声明：真实做旧纹理 CSS 不可得 → 纯色块 + pattern + mix-blend 近似（约 72% 还原）。<br>
+      色板推导：不取自条目示例，取自「80 年代 Memphis 家具漆面」这一文化语境，按 CMYK 印刷压低 chroma。<br>
+      循环：6.0s · 曲柄 6 转 · 齿比 1.15 · 路面 tile = 总位移/8（无缝）· 前景 = 总位移/13。
+    </p>
+  </div>
+  <div class="swatches">
+    <div class="sw" style="background:#EADFC4"><i>EADFC4</i></div>
+    <div class="sw" style="background:#1C1B19"><i class="light" style="color:rgba(255,255,255,.72)">1C1B19</i></div>
+    <div class="sw" style="background:#C0392B"><i class="light" style="color:rgba(255,255,255,.72)">C0392B</i></div>
+    <div class="sw" style="background:#D8A72A"><i>D8A72A</i></div>
+    <div class="sw" style="background:#2E5FA3"><i class="light" style="color:rgba(255,255,255,.72)">2E5FA3</i></div>
+    <div class="sw" style="background:#7A5C9E"><i class="light" style="color:rgba(255,255,255,.72)">7A5C9E</i></div>
+    <div class="sw" style="background:#6E7B3F"><i class="light" style="color:rgba(255,255,255,.72)">6E7B3F</i></div>
+  </div>
+</div>
+
+<script>
+/* ━━━━━━━━━ 时钟骨架（animation-pitfalls #12 模板，逐行照做）━━━━━━━━━ */
+"use strict";
+let time = 0, playing = false, lastTick = null;
+
+/* ━━━━━━━━━ rig 常量（与 SVG 内坐标严格一致，勿改一边）━━━━━━━━━ */
+const R = 110, HUBR = {x:690,y:770}, HUBF = {x:1075,y:770};
+const BB  = {x:818,y:800}, CR = 70;
+const HIP = {x:790,y:640}, L1 = 115, L2 = 122;   // 237 > 最远 232.4，恒可解，脚永不脱离脚踏
+const CADENCE = 1.0, REVS = 6, GEAR = 1.15, DUR = CADENCE*REVS, SCALE = 1.06;
+const WHEEL_ARC = 2*Math.PI*R*GEAR/CADENCE;                 // 每「秒」的地面位移（rig px）
+const TOTAL_RIG = WHEEL_ARC*DUR;                            // 一个循环的总位移
+/* tile 由总位移反推 → 循环末偏移恰好归零，无缝 */
+const ROAD_TILE = (TOTAL_RIG*SCALE)/8, FG_TILE = (TOTAL_RIG*SCALE)/13;
+
+const $ = id => document.getElementById(id);
+const svg = document.getElementById('frame');
+const NS = 'http://www.w3.org/2000/svg';
+
+/* 生成可平铺的重复元素 */
+function tile(group, count, w, make){
+  const g = $(group);
+  for(let i=0;i<count;i++){ const n = make(i*w, i); n.setAttribute('data-i', i); g.appendChild(n); }
+  return {w, span:count*w};
+}
+function rect(x,y,ww,hh,f,extra){ const r=document.createElementNS(NS,'rect');
+  r.setAttribute('x',x);r.setAttribute('y',y);r.setAttribute('width',ww);r.setAttribute('height',hh);
+  r.setAttribute('fill',f); if(extra)for(const k in extra)r.setAttribute(k,extra[k]); return r; }
+function poly(pts,f,st,w){ const p=document.createElementNS(NS,'polygon');
+  p.setAttribute('points',pts); if(f)p.setAttribute('fill',f); if(st){p.setAttribute('stroke',st);p.setAttribute('stroke-width',w||0);} return p; }
+
+const ROAD = tile('roadDashes', 22, ROAD_TILE, (x)=>{
+  const g = document.createElementNS(NS,'g');
+  g.appendChild(rect(x,996,ROAD_TILE*0.42,16,'#F6F1E2'));
+  g.appendChild(poly(`${x+ROAD_TILE*0.62},1014 ${x+ROAD_TILE*0.74},990 ${x+ROAD_TILE*0.86},1014`,'#1C1B19'));
+  return g;
+});
+const FG = tile('fgTris', 26, FG_TILE, (x)=>
+  poly(`${x},${1044} ${x+FG_TILE*0.3},${1044} ${x+FG_TILE*0.15},${1044-30}`,'#D8A72A','#1C1B19',5));
+
+/* 速度线（Memphis 动感符号，分相位闪现）*/
+const SPK = [];
+for(let i=0;i<3;i++){
+  const p = document.createElementNS(NS,'path');
+  p.setAttribute('stroke','#1C1B19'); p.setAttribute('stroke-width','11');
+  p.setAttribute('fill','none'); p.setAttribute('stroke-linecap','round');
+  p.setAttribute('d',`M0,0 l-92,-16 M0,22 l-118,4 M0,44 l-84,22`);
+  svg.appendChild(p); SPK.push(p);
+}
+
+/* ━━━━━━━━━ 两骨 IK（踝/膝）：髋→脚，膝向前顶 ━━━━━━━━━ */
+function ik(hx,hy,fx,fy,l1,l2){
+  let dx=fx-hx, dy=fy-hy, d=Math.hypot(dx,dy);
+  const max=l1+l2-0.5, min=Math.abs(l1-l2)+0.5;
+  if(d>max){ d=max; const k=max/Math.hypot(dx,dy); fx=hx+dx*k; fy=hy+dy*k; }
+  else if(d<min){ d=min; }
+  const a=Math.atan2(dy,dx);
+  const A=Math.acos(Math.max(-1,Math.min(1,(l1*l1+d*d-l2*l2)/(2*l1*d))));
+  const ka=a-A;                                    // 负号 → 膝向画面前方顶（鸟的解剖）
+  return {kx:hx+l1*Math.cos(ka), ky:hy+l1*Math.sin(ka), fx, fy};
+}
+function setLine(el,x1,y1,x2,y2){
+  el.setAttribute('x1',x1);el.setAttribute('y1',y1);el.setAttribute('x2',x2);el.setAttribute('y2',y2);
+}
+function leg(thigh,shin,footG,pedalG,crankEl,th){
+  const fx=BB.x+CR*Math.cos(th), fy=BB.y+CR*Math.sin(th);
+  const s=ik(HIP.x,HIP.y,fx,fy,L1,L2);
+  setLine(thigh,HIP.x,HIP.y,s.kx,s.ky);
+  setLine(shin,s.kx,s.ky,fx,fy);
+  /* 蹼足：几乎不折踝，踩平在脚踏上，脚尖朝前 */
+  const lead = Math.atan2(fy-BB.y, fx-BB.x);
+  footG.setAttribute('transform',`translate(${fx},${fy-6}) rotate(${-8+7*Math.sin(lead)})`);
+  if(pedalG) pedalG.setAttribute('transform',`translate(${fx},${fy+8})`);
+  if(crankEl) setLine(crankEl,BB.x,BB.y,fx,fy);
+  return s;
+}
+
+/* ━━━━━━━━━ render(t) —— t 的纯函数，可 seek ━━━━━━━━━ */
+function render(t){
+  const th = (t/CADENCE)*2*Math.PI;               // 曲柄角
+  const wa = th*GEAR*180/Math.PI;                 // 轮角（度，正值=顺时针）
+
+  $('wheelR').setAttribute('transform',`rotate(${wa} ${HUBR.x} ${HUBR.y})`);
+  $('wheelF').setAttribute('transform',`rotate(${wa} ${HUBF.x} ${HUBF.y})`);
+
+  /* 双腿相位差 180°，近侧在 th，远侧在 th+π */
+  leg($('nThigh'),$('nShin'),$('nFoot'),$('nearPedal'),$('nearCrank'), th);
+  leg($('fThigh'),$('fShin'),$('fFoot'),null,null, th+Math.PI);
+
+  /* 车身：左右晃 1×、上下颠 2×（双腿对称做功）*/
+  const bobX = 7*Math.sin(th), bobY = -9*Math.sin(2*th) - 3;
+  const lean = 1.4*Math.sin(th);
+  $('rig').setAttribute('transform',
+    `translate(${1140+bobX},${587+bobY}) scale(${SCALE}) rotate(${lean} 865 530) translate(-865,-530)`);
+
+  /* 头颈反向Counter-bob，喉囊带 0.34 转的滞后（柔体惯性 = 节奏来源）*/
+  $('headG').setAttribute('transform',`translate(${4*Math.sin(th+0.4)},${-11*Math.sin(2*th+0.5)})`);
+  $('pouchG').setAttribute('transform',
+    `translate(0,${9*Math.sin(th-2.1)}) rotate(${2.2*Math.sin(th-2.4)} 1058,290)`);
+  $('fish').setAttribute('transform',`rotate(${-5*Math.sin(th-1.3)} 1214,392)`);
+
+  /* 围巾：两条滞后波 */
+  const w=(ph,amp,n)=>{let d=`M902,300`;for(let i=1;i<=n;i++){const x=902-i*44,y=300+amp*Math.sin(th*2-x*0.011+ph);d+=` L${x},${y}`;}return d;};
+  $('scarf').setAttribute('d', w(0,16,4));
+  $('scarf2').setAttribute('d', w(1.1,11,4));
+  $('wing').setAttribute('transform',`translate(0,${-2.5*Math.sin(2*th)})`);
+
+  /* 路面 / 前景 位移（滚动接触：位移 = 轮角×半径）；路面色带本身不动，只有 tile 动 */
+  const dist = t*WHEEL_ARC*SCALE;
+  $('roadDashes').setAttribute('transform',`translate(${-(dist%ROAD_TILE)},0)`);
+  $('fgTris').setAttribute('transform',`translate(${-((dist*1.625)%FG_TILE)},0)`);
+  $('squiggle').setAttribute('transform',`translate(${-((dist*0.06)%(1920))},0)`);
+  $('arches').setAttribute('transform',`translate(${-((dist*0.03)%(1920))},0)`);
+
+  /* 速度线分相位闪现（每转出现一次，藏在蹬踏发力点）*/
+  const frac = (t/CADENCE)%1;
+  SPK.forEach((p,i)=>{
+    const c = (frac - i*0.1 + 1)%1;
+    const on = c < 0.34 ? Math.sin(c/0.34*Math.PI) : 0;
+    p.setAttribute('opacity', (on*0.85).toFixed(3));
+    p.setAttribute('transform', `translate(${1140+(430-i*34)*SCALE - on*70},${587+(470+i*54)*SCALE}) scale(${SCALE})`);
+  });
+}
+
+/* ━━━━━━━━━ boot + tick ━━━━━━━━━ */
+function tick(now){
+  if(lastTick===null){ lastTick=now; window.__ready=true; render(0); requestAnimationFrame(tick); return; }
+  const dt=(now-lastTick)/1000; lastTick=now;
+  if(playing){
+    let t=time+dt;
+    if(t>=DUR){ t = window.__recording ? DUR-0.001 : 0; }
+    time=t; render(time);
+  }
+  requestAnimationFrame(tick);
+}
+document.fonts.ready.then(()=>{ render(0); playing=true; requestAnimationFrame(tick); });
+window.__seek=t=>{time=t;render(t);};window.__pause=()=>{playing=false;};window.__duration=DUR;
+</script>
+</body>
+</html>

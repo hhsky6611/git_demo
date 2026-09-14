@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>方向板 3 · 最佳设计师 · Sylvain Chomet 蛋彩手绘叙事</title>
+<!--
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  逻辑三 · 最佳设计师（深呼吸 · 顶级定制）
+  深呼吸一口。要为「一只鸟固执地骑车回家」这个内容找世界上最合适的人——
+  不是做 UI 的工作室，是 **Sylvain Chomet**（《疯狂约会美丽都》《魔术师》）。
+  他的语料恰好就是这个题材：干瘦拉长的形体、老式自行车、水粉/蛋彩的灰调、
+  物理喜剧、一声不吭的坚毅。他的鹈鹕一定不卖萌，一定在用力。
+
+  迁移的设计哲学（不是复制画面）：
+  1. 形体向「长度」夸张：腿极长极细、头极小、身子压缩 —— 与前两版（短腿大身）反向
+  2. 一切颜色都蒙一层纸灰（水粉未上满白底的感觉），没有一块纯色是"干净"的
+  3. 机械要有真实细节与年代感：挡泥板、链条罩、磨电灯、前车筐里的法棍
+  4. 喜剧来自「吃力的庄重」：每隔两转站起来蹬一次，像逆风上坡
+  5. 手绘感靠轮廓抖动（feTurbulence + feDisplacementMap 静态位移），不是靠贴图
+
+  与另两版的骨架差异：**低机位纵深**——地平线压到 65% 高度，主体缩在左下 1/3，
+  右侧 58% 留给退远的路与电线杆（setup→payoff：他在骑进那片空里）。
+  前两版主体都在画面中部，本版把主体挤到角落，让"路程"成为主角。
+  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+-->
+<style>
+  :root{--paper:#E8E0CE;--ink:#2F2A24;--slate:#55636B;--brick:#A8583F;--sage:#7C8560;--ochre:#C67A3E;--feather:#E2DCCB}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#221F1B}
+  body{font-family:"Bradley Hand","Chalkboard","Hiragino Sans GB","STHeiti",cursive,sans-serif;color:#E4DDCB;padding:26px 0 44px}
+  #stage{position:relative;width:1920px;height:1080px;margin:0 auto;overflow:hidden;background:var(--paper);transform-origin:top left}
+  #frame{display:block;width:1920px;height:1080px}
+  .overlay{position:absolute;inset:0;pointer-events:none}
+  .title{position:absolute;right:112px;top:126px;text-align:right;transform:rotate(-2.2deg)}
+  .title h1{font-family:"Songti SC","Hiragino Mincho ProN",serif;font-size:116px;font-weight:700;
+    color:#4A4A42;letter-spacing:.1em;line-height:1;transform:skewX(-3deg)}
+  .title p{font-family:"Iowan Old Style","Palatino",serif;font-style:italic;font-size:26px;color:#8A857A;margin-top:8px;letter-spacing:.02em}
+  .sig{position:absolute;left:104px;bottom:74px;font-family:"Iowan Old Style","Songti SC",serif;
+    font-size:20px;color:#6E6A5E;letter-spacing:.06em;transform:rotate(-.6deg)}
+  .chrome{margin:22px auto 0;width:1920px;display:grid;grid-template-columns:1fr auto;gap:26px;align-items:start}
+  .chrome h2{font-size:15px;letter-spacing:.26em;color:#8B8478;margin-bottom:12px;font-family:"Menlo",monospace}
+  .chrome p{font-size:19px;line-height:1.68;color:#DCD4C2;max-width:1180px}
+  .chrome p b{color:#fff}
+  .chrome .facts{font-family:"Menlo",monospace;font-size:14px;color:#948D7E;margin-top:12px;line-height:1.75}
+  .swatches{display:flex;border:1px solid #4A443A}
+  .sw{width:66px;height:96px;position:relative}
+  .sw i{position:absolute;left:0;right:0;bottom:5px;text-align:center;font-style:normal;font-family:"Menlo",monospace;font-size:9.5px;color:rgba(0,0,0,.6);letter-spacing:-.03em}
+  .sw.l i{color:rgba(255,255,255,.72)}
+</style>
+</head>
+<body>
+<div id="stage">
+<svg id="frame" viewBox="0 0 1920 1080" aria-label="鹈鹕骑自行车 · 蛋彩方向板">
+<defs>
+  <linearGradient id="sk" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#C8CFC6"/><stop offset=".55" stop-color="#DAD6C4"/><stop offset="1" stop-color="#E8E0CE"/>
+  </linearGradient>
+  <linearGradient id="wt" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0" stop-color="#9A968A"/><stop offset="1" stop-color="#8C8879"/>
+  </linearGradient>
+  <!-- 手绘轮廓抖动（静态位移，读作钢笔不老实，而不是沸腾）-->
+  <filter id="wob" x="-8%" y="-8%" width="116%" height="116%" color-interpolation-filters="sRGB">
+    <feTurbulence type="fractalNoise" baseFrequency="0.017 0.021" numOctaves="2" seed="7" result="n"/>
+    <feDisplacementMap in="SourceGraphic" in2="n" scale="5" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <!-- 水粉颗粒 + 纸纹 -->
+  <filter id="grain" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="3" seed="3"/>
+    <feColorMatrix type="matrix" values="0 0 0 0 .18  0 0 0 0 .16  0 0 0 0 .12  0 0 0 .9 0"/>
+  </filter>
+  <filter id="wash" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.0035" numOctaves="4" seed="11"/>
+    <feColorMatrix type="matrix" values="0 0 0 0 .42  0 0 0 0 .40  0 0 0 0 .32  0 0 0 .55 0"/>
+  </filter>
+</defs>
+
+<rect width="1920" height="1080" fill="url(#sk)"/>
+
+<!-- ══════ 后景 0.35×：云团 + 远镇 + 风车（低地平线 = 65%）══════ -->
+<g id="far">
+  <g id="clouds" fill="#AFB7AE" opacity=".72"></g>
+  <g id="town"></g>
+</g>
+<!-- ══════ 中景 0.7×：田篱 + 高草 + 退远的斜路面 ══════ -->
+<g id="mid"></g>
+<!-- 地面（固定，路面纹理自己走）-->
+<path d="M0,700 L1920,700 L1920,1080 L0,1080 Z" fill="#A6A08F"/>
+<path d="M0,700 L1920,700 L1920,726 L0,726 Z" fill="#8E8A7B"/>
+<g id="roadTex"></g>
+<!-- ══════ 前景 1.5×：电线杆 + 湿路反光 + 飘叶 + 细雨 ══════ -->
+<g id="poles"></g>
+<g id="drizzle" opacity=".3"></g>
+
+<!-- ══════ 骑手（长腿、小头、吃力）══════ -->
+<g id="rider">
+ <g filter="url(#wob)">
+  <g id="rig" transform="translate(700,580) translate(-800,-560)">
+    <ellipse cx="820" cy="924" rx="330" ry="16" fill="#5D5A4F" opacity=".3"/>
+    <g id="bikeShadow"></g>
+
+    <!-- 远侧腿（细长，压在车身后面）-->
+    <g id="farLeg" opacity=".62">
+      <line id="farCrank" stroke="#3A352C" stroke-width="8" stroke-linecap="round"/>
+      <line id="fThigh" stroke="#4A453A" stroke-width="13" stroke-linecap="round"/>
+      <line id="fShin" stroke="#4A453A" stroke-width="10" stroke-linecap="round"/>
+      <g id="fFoot"><path d="M0,-6 l46,-8 q10,4 7,14 l-6,15 q-4,6 -12,4 l-37,-9 Z" fill="#A8763F" stroke="#2F2A24" stroke-width="3.4" stroke-linejoin="round"/></g>
+    </g>
+
+    <!-- 老式通勤车：挡泥板 + 链条罩 + 磨电灯 + 后货架皮包 + 前筐法棍 -->
+    <g id="bike">
+      <g id="wheelR">
+        <circle cx="660" cy="802" r="118" fill="none" stroke="#3A352C" stroke-width="11"/>
+        <circle cx="660" cy="802" r="103" fill="none" stroke="#8C8879" stroke-width="4"/>
+        <g id="spokesR" stroke="#7E7A6C" stroke-width="1.7"></g>
+        <circle cx="660" cy="802" r="9" fill="#59544A"/>
+      </g>
+      <g id="wheelF">
+        <circle cx="1075" cy="802" r="118" fill="none" stroke="#3A352C" stroke-width="11"/>
+        <circle cx="1075" cy="802" r="103" fill="none" stroke="#8C8879" stroke-width="4"/>
+        <g id="spokesF" stroke="#7E7A6C" stroke-width="1.7"></g>
+        <circle cx="1075" cy="802" r="9" fill="#59544A"/>
+      </g>
+      <!-- 挡泥板（前挡会抖动）-->
+      <path id="fenderR" d="M560,700 A128,128 0 0 1 776,752" fill="none" stroke="#5A6552" stroke-width="11" stroke-linecap="round"/>
+      <g id="fenderF"><path d="M975,742 A128,128 0 0 1 1120,690" fill="none" stroke="#5A6552" stroke-width="11" stroke-linecap="round"/></g>
+      <!-- 链条罩 -->
+      <path d="M660,788 L800,816 M660,816 L800,844" stroke="#5E5949" stroke-width="5"/>
+      <path d="M700,780 q60,-6 108,14" fill="none" stroke="#5E5949" stroke-width="16" opacity=".55"/>
+      <circle cx="660" cy="802" r="17" fill="none" stroke="#5E5949" stroke-width="5"/>
+      <!-- 车架（锈绿）-->
+      <g stroke="#6B7A5E" stroke-width="13" stroke-linecap="round" fill="none">
+        <line x1="800" y1="830" x2="660" y2="802"/>
+        <line x1="800" y1="830" x2="737" y2="566"/>
+        <line x1="800" y1="830" x2="1036" y2="706"/>
+        <line x1="740" y1="570" x2="1020" y2="640"/>
+        <line x1="742" y1="566" x2="660" y2="802"/>
+      </g>
+      <line x1="1018" y1="638" x2="1044" y2="712" stroke="#6B7A5E" stroke-width="15" stroke-linecap="round"/>
+      <path d="M1030,652 C1052,700 1066,752 1075,802" fill="none" stroke="#6B7A5E" stroke-width="12"/>
+      <circle cx="800" cy="830" r="30" fill="none" stroke="#5E5949" stroke-width="5"/>
+      <circle cx="800" cy="830" r="8" fill="#3A352C"/>
+      <line x1="737" y1="572" x2="735" y2="548" stroke="#3A352C" stroke-width="9"/>
+      <path d="M676,548 q66,-16 122,2 q-6,18 -54,18 q-52,0 -68,-20 Z" fill="#4E4A3E" stroke="#2F2A24" stroke-width="3.6"/>
+      <!-- 弯把（后掠， upright 骑姿）-->
+      <path d="M1018,634 q-6,-46 -46,-64 q-26,-12 -46,4" fill="none" stroke="#3A352C" stroke-width="10" stroke-linecap="round"/>
+      <circle id="grip" cx="962" cy="574" r="11" fill="#2F2A24"/>
+      <!-- 磨电灯 + 光斑 -->
+      <g id="lamp"><circle cx="1112" cy="716" r="21" fill="#B9AE93" stroke="#3A352C" stroke-width="4"/>
+        <circle cx="1112" cy="716" r="10" fill="#E9E1C6"/></g>
+      <!-- 后货架 + 皮包 -->
+      <path d="M560,646 l120,-12 l6,18 l-122,14 Z" fill="#4E4A3E"/>
+      <g id="satchel"><rect x="556" y="652" width="112" height="76" rx="9" fill="#7A5738" stroke="#2F2A24" stroke-width="4"/>
+        <path d="M556,684 l112,-8" stroke="#2F2A24" stroke-width="3.6" fill="none"/>
+        <rect x="596" y="676" width="26" height="16" rx="3" fill="#B9AE93" stroke="#2F2A24" stroke-width="3"/></g>
+      <!-- 前筐：法棍 + 报纸 -->
+      <g id="basket">
+        <path d="M1084,628 l118,-6 l-10,64 l-104,8 Z" fill="#A5834E" stroke="#2F2A24" stroke-width="4" stroke-linejoin="round"/>
+        <g stroke="#2F2A24" stroke-width="2.6" opacity=".5"><line x1="1104" y1="628" x2="1098" y2="694"/><line x1="1134" y1="626" x2="1130" y2="692"/><line x1="1164" y1="624" x2="1160" y2="688"/></g>
+        <path d="M1082,616 q66,-40 140,-8 q-14,26 -76,26 q-50,0 -64,-18 Z" fill="#D8B77A" stroke="#2F2A24" stroke-width="3.6"/>
+        <g stroke="#2F2A24" stroke-width="2.4" fill="none" opacity=".6"><path d="M1110,606 q34,-14 70,-6"/><path d="M1104,618 q40,-10 80,-2"/></g>
+        <path d="M1092,622 l-26,-30 l34,-8 l20,30 Z" fill="#E4DDCB" stroke="#2F2A24" stroke-width="3.2"/>
+      </g>
+    </g>
+
+    <!-- 鹈鹕：小头 + 长颈 + 压缩的身子 + 巨大喙与囊 -->
+    <g id="bird">
+      <path d="M576,452 q-70,-20 -114,6 q46,38 118,32 Z" fill="#CFC8B4" stroke="#2F2A24" stroke-width="4"/>
+      <path d="M560,410 q30,-96 152,-104 q120,-8 156,86 q28,84 -30,140 q-66,60 -166,42 q-108,-20 -112,-164 Z"
+            fill="#E2DCCB" stroke="#2F2A24" stroke-width="4.6"/>
+      <g fill="none" stroke="#B0A893" stroke-width="3"><path d="M600,370 q82,-36 186,-18"/><path d="M586,428 q88,-24 196,-2"/><path d="M598,486 q80,-14 164,10"/></g>
+      <path d="M556,398 q-30,58 -6,116 q46,24 104,10 q-40,-54 -46,-128 Z" fill="#4B4740"/>
+      <!-- 长颈（占身高一半以上，Chomet 式拉长）-->
+      <path id="neck" d="M742,368 C742,268 796,196 892,164 l34,44 C864,240 826,290 812,392 Z"
+            fill="#E7E1D2" stroke="#2F2A24" stroke-width="4.6"/>
+      <g id="headG">
+        <path d="M900,148 q28,-26 58,-10 q-24,8 -32,24 Z" fill="#CFC8B4" stroke="#2F2A24" stroke-width="3"/>
+        <circle cx="928" cy="178" r="36" fill="#E7E1D2" stroke="#2F2A24" stroke-width="4.6"/>
+        <circle cx="942" cy="168" r="6.5" fill="#2F2A24"/>
+        <path d="M960,180 q14,-4 18,8" fill="none" stroke="#A8763F" stroke-width="4"/>
+        <!-- 巨大而下垂的喙与囊（占画面宽度 1/5）-->
+        <path d="M958,164 L1224,240 q12,6 4,14 l-12,8 L954,196 Z" fill="#C67A3E" stroke="#2F2A24" stroke-width="4" stroke-linejoin="round"/>
+        <g id="pouchG"><path d="M954,196 C964,320 1074,362 1186,262 L1174,248 L956,202 Z"
+             fill="#B76E39" stroke="#2F2A24" stroke-width="4" stroke-linejoin="round"/>
+          <path d="M984,238 q80,74 164,6" fill="none" stroke="#8A5023" stroke-width="3.4" opacity=".7"/></g>
+        <path id="brim" d="M1224,240 l26,10 l-14,18 Z" fill="#4B4740"/>
+      </g>
+      <!-- 围巾（砖红，唯一暖色，滞后飘动）-->
+      <path id="scarfA" d="" fill="none" stroke="#A8583F" stroke-width="19" stroke-linecap="round"/>
+      <path id="scarfB" d="" fill="none" stroke="#8E4630" stroke-width="11" stroke-linecap="round" opacity=".9"/>
+      <!-- 翅：握把 -->
+      <path id="wing" d="M774,362 C846,392 916,480 962,558 l14,22 q-38,8 -62,-26 C872,502 812,420 758,392 Z"
+            fill="#E7E1D2" stroke="#2F2A24" stroke-width="4.6" stroke-linejoin="round"/>
+      <g fill="none" stroke="#B0A893" stroke-width="2.8"><path d="M826,410 q18,24 20,46"/><path d="M866,456 q18,24 20,46"/><path d="M906,504 q16,22 18,42"/></g>
+      <!-- 长腿（150+160，几乎够到最底）-->
+      <g id="nearLeg">
+        <line id="nThigh" stroke="#4A453A" stroke-width="17" stroke-linecap="round"/>
+        <line id="nShin" stroke="#4A453A" stroke-width="12" stroke-linecap="round"/>
+        <circle id="nHock" r="10" fill="#CFC8B4" stroke="#2F2A24" stroke-width="3"/>
+        <g id="nFoot"><path d="M0,-7 l52,-9 q11,4 8,16 l-7,17 q-4,6 -12,4 l-43,-10 Z" fill="#C67A3E" stroke="#2F2A24" stroke-width="4" stroke-linejoin="round"/>
+          <g stroke="#2F2A24" stroke-width="2.2" opacity=".7"><line x1="10" y1="-2" x2="48" y2="-2"/><line x1="10" y1="6" x2="46" y2="8"/></g></g>
+      </g>
+      <line id="nearCrank" stroke="#2F2A24" stroke-width="8" stroke-linecap="round"/>
+      <g id="nearPedal"><rect x="-22" y="-6" width="44" height="12" rx="2" fill="#59544A" stroke="#2F2A24" stroke-width="2.6"/></g>
+    </g>
+  </g>
+ </g>
+</g>
+
+<g id="reedsFront"></g>
+<!-- 绕头的苍蝇（Chomet 的招牌注脚）-->
+<circle id="fly" r="3.4" fill="#2F2A24" opacity=".85"/>
+<!-- 逆风气流线 -->
+<g id="gust" stroke="#8A8A7C" stroke-width="4" fill="none" stroke-linecap="round" opacity="0"></g>
+
+<!-- 水粉颗粒 + 纸纹（盖在画面上，不参与运动）-->
+<rect width="1920" height="1080" filter="url(#wash)" opacity=".5" style="mix-blend-mode:multiply"/>
+<rect width="1920" height="1080" filter="url(#grain)" opacity=".16" style="mix-blend-mode:multiply"/>
+</svg>
+
+<div class="overlay">
+  <div class="title"><h1>下班</h1><p>fin de journée</p></div>
+</div>
+</div>
+
+<!-- ═══════ 看板 chrome（不属于成片画面）═══════ -->
+<div class="chrome no-record">
+  <div>
+    <h2>方向板 3 · 逻辑三「最佳设计师」</h2>
+    <p>
+      <b>启用</b>：Sylvain Chomet（《疯狂约会美丽都》《魔术师》）的设计哲学——
+      干瘦拉长的形体、老式自行车、水粉灰调、一声不吭的物理喜剧。
+      <b>form 来自内容</b>：这只鹈鹕的笑点不在「鸟骑车」这个造型，而在<b>它的吃力</b>。
+      所以本版把形体向「长」夸张（腿 310 / 头 36，前两版是短腿大身），
+      把主体挤到画面左下 1/3，让右边 58% 的空旷替它说出「还有很远」。
+      <b>120% 细节</b>：挡泥板的抖动、磨电灯、筐里那根比喙还长的法棍、绕头的苍蝇。
+    </p>
+    <p class="facts">
+      降级声明：水粉/赛璐珞的实体颜料厚度做不出来 → 用 feTurbulence 位移做轮廓手抖 + 双层纸纹 multiply 近似（约 80%）。<br>
+      色板论证：取自 Chomet 的蛋彩赛璐珞——每块颜色都掺一层纸灰 #E8E0CE，没有一块是干净纯色；唯一暖色是围巾砖红。<br>
+      循环 7.5s · 曲柄 6 转 · 每 2 转一次站起来蹬（提臀 26px + 车身俯仰 + 气流线闪现）· 三层视差 0.35/0.7/1.5。
+    </p>
+  </div>
+  <div class="swatches">
+    <div class="sw" style="background:#E8E0CE"><i>E8E0CE</i></div>
+    <div class="sw" style="background:#C8CFC6"><i>C8CFC6</i></div>
+    <div class="sw" style="background:#A6A08F"><i>A6A08F</i></div>
+    <div class="sw" style="background:#6B7A5E"><i class="l">6B7A5E</i></div>
+    <div class="sw" style="background:#A8583F"><i class="l">A8583F</i></div>
+    <div class="sw" style="background:#C67A3E"><i>C67A3E</i></div>
+    <div class="sw" style="background:#55636B"><i class="l">55636B</i></div>
+    <div class="sw" style="background:#2F2A24"><i class="l">2F2A24</i></div>
+  </div>
+</div>
+
+<script>
+"use strict";
+let time=0,playing=false,lastTick=null;
+const R=118,HUBR={x:660,y:802},HUBF={x:1075,y:802};
+const BB={x:800,y:830},CR=74;
+const HIP={x:742,y:560},L1=170,L2=185;    // 355 > 最远 351 → Chomet 式长腿，几乎全伸仍不脱离脚踏
+const CADENCE=1.25,REVS=6,GEAR=1.08,DUR=CADENCE*REVS;   // 慢，庄重
+const ARC_PS=2*Math.PI*R*GEAR/CADENCE;
+const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';
+function mk(t,a){const n=document.createElementNS(NS,t);for(const k in a)n.setAttribute(k,a[k]);return n;}
+[['spokesR',HUBR],['spokesF',HUBF]].forEach(([g,c])=>{for(let i=0;i<16;i++){const a=i/16*Math.PI*2;
+  $(g).appendChild(mk('line',{x1:c.x+9*Math.cos(a),y1:c.y+9*Math.sin(a),x2:c.x+102*Math.cos(a),y2:c.y+102*Math.sin(a)}));}});
+const fr = i => { const x = Math.sin(i*127.1+311.7)*43758.5453; return x-Math.floor(x); };
+/* ── 视差平铺器：先由「一个循环的总位移」反推 tile 宽度 w，再按 w 生成内容 ──
+   （旧写法先生成固定宽内容再按算出的 w 克隆；w < 内容宽时克隆层互相重叠，
+     天际线与电线杆会长成鬼影墙。反过来做：内容永远刚好铺满一个 tile）*/
+function tileLayer(id, layerSpeed, targetW, gen){
+  const total=ARC_PS*DUR*layerSpeed;
+  const n=Math.max(1,Math.round(total/targetW)), w=total/n;
+  const g=$(id); g.textContent='';
+  const proto=[]; gen(w,proto); proto.forEach(el=>g.appendChild(el));
+  for(let c=1;c<=Math.ceil(1920/w)+1;c++) proto.forEach(el=>{
+    const cl=el.cloneNode(true); cl.setAttribute('transform',`translate(${c*w},0)`); g.appendChild(cl);});
+  return {g,w,layerSpeed};
+}
+const TL=[
+  /* 后景 0.35×：水粉云团 */
+  tileLayer('clouds',.35,660,(w,out)=>{for(let k=0;k<2;k++){
+    const x=(k+.08)/2*w, y=150+fr(k)*120, s=.8+fr(k+4)*.7;
+    out.push(mk('path',{d:`M${x},${y} q28,${-44*s} 76,${-14*s} q26,${-38*s} 76,${-6*s} q46,${-8*s} 40,${26*s} L${x},${y+6*s} Z`,opacity:.45+fr(k+2)*.35}));}}),
+  /* 后景 0.35×：小镇天际线——疏密靠「5 房 + 1 塔 + 1 风车」，不靠堆重复 */
+  tileLayer('town',.35,900,(w,out)=>{
+    const cols=['#9A8E79','#8C8170','#A2957E'], N=5;
+    out.push(mk('rect',{x:0,y:700,width:w,height:20,fill:'#8E8A7B',opacity:.45}));
+    for(let k=0;k<N;k++){
+      const bw=w*(.085+fr(k)*.06), x=(k+.05)/N*w, h=50+fr(k+3)*76, y=700-h;
+      out.push(mk('rect',{x,y,width:bw,height:h,fill:cols[k%3]}));
+      out.push(mk('path',{d:`M${x-6},${y} L${x+bw/2},${y-18-fr(k+7)*16} L${x+bw+6},${y} Z`,fill:'#5C6A70',opacity:.85}));
+      out.push(mk('rect',{x:x+bw*.24,y:y+24,width:10,height:13,fill:'#C6B98F',opacity:k%2?.7:.28}));}
+    const sx=w*.7;
+    out.push(mk('path',{d:`M${sx},700 l0,-118 M${sx-17},590 l34,0 M${sx-11},606 l22,0`,stroke:'#5C6A70','stroke-width':6,fill:'none'}));
+    out.push(mk('path',{d:`M${sx},590 l-8,-24 l16,0 Z`,fill:'#5C6A70'}));
+    const wx=w*.32;
+    out.push(mk('path',{d:`M${wx-17},700 l17,-64 l17,64 Z`,fill:'#8C8170'}));
+    out.push(mk('path',{d:`M${wx},636 l-26,-16 M${wx},636 l26,-16 M${wx},636 l-20,22 M${wx},636 l20,22`,stroke:'#6E6552','stroke-width':4.5,fill:'none'}));}),
+  /* 中景 0.7×：高草 + 田篱 */
+  tileLayer('mid',.7,280,(w,out)=>{
+    for(let k=0;k<5;k++){const x=(k+fr(k)*.6)/5*w, h=30+fr(k+6)*48;
+      out.push(mk('path',{d:`M${x},700 l0,${-h} M${x+14},700 l6,${-h-9} M${x+27},700 l-6,${-h+8}`,stroke:'#7C8560','stroke-width':3,fill:'none',opacity:.9}));}
+    out.push(mk('rect',{x:w*.12,y:666,width:w*.5,height:8,fill:'#6E6A52',opacity:.75}));
+    out.push(mk('rect',{x:w*.2,y:666,width:8,height:34,fill:'#6E6A52',opacity:.75}));
+    out.push(mk('rect',{x:w*.52,y:666,width:8,height:34,fill:'#6E6A52',opacity:.75}));}),
+  /* 地面 1.0×：湿路龟裂 + 反光 */
+  tileLayer('roadTex',1.0,240,(w,out)=>{
+    out.push(mk('path',{d:`M${w*.06},764 q26,-8 54,4 M${w*.5},812 q30,10 58,-4 M${w*.2},900 l30,12 l28,-6`,
+      stroke:'#7E7A6C','stroke-width':2.2,fill:'none',opacity:.55}));
+    out.push(mk('ellipse',{cx:w*.34,cy:884,rx:52,ry:10,fill:'#B7B3A2',opacity:.26}));
+    out.push(mk('ellipse',{cx:w*.78,cy:988,rx:60,ry:12,fill:'#B7B3A2',opacity:.2}));}),
+  /* 前景 1.5×：电线杆（一根一 tile，间距即节奏）*/
+  tileLayer('poles',.85,620,(w,out)=>{
+    out.push(mk('path',{d:`M0,764 l4,-262 M-30,518 l62,0 M-23,540 l48,0 M-26,494 q30,-14 54,2`,stroke:'#4A453A','stroke-width':8.5,fill:'none',opacity:.8}));
+    out.push(mk('path',{d:`M-30,500 q64,-26 118,8`,stroke:'#4A453A','stroke-width':3,fill:'none',opacity:.5}));}),
+  /* 真前景 1.6×：芦苇簇，画在骑手之后，会挡一下主体（遮挡=深度）*/
+  tileLayer('reedsFront',1.6,760,(w,out)=>{
+    for(let k=0;k<3;k++){const x=(k+.2+fr(k)*.3)/3*w,h=70+fr(k+5)*54;
+      out.push(mk('path',{d:`M${x},1078 q10,${-h} 26,${-h-24} M${x+16},1078 q-4,${-h} -18,${-h-14} M${x+30},1078 q14,${-h} 34,${-h+6}`,
+        stroke:'#5F6A4A','stroke-width':5,fill:'none',opacity:.9}));}}),
+  /* 前景 0.55×：斜雨（顺风走，比人眼快不了多少；1.8× 会糊成栅栏）*/
+  tileLayer('drizzle',.55,150,(w,out)=>{
+    for(let k=0;k<5;k++){const x=(k+.2+fr(k)*.4)/5*w, y=50+fr(k+8)*800;
+      out.push(mk('line',{x1:x,y1:y,x2:x-13,y2:y+64,stroke:'#C8CFC6','stroke-width':2.4}));}}),
+];
+(()=>{const g3=$('gust');for(let i=0;i<3;i++) g3.appendChild(mk('path',{d:`M0,0 q-34,${-6-i*4} -78,${2+i*3}`,stroke:'#8A8A7C','stroke-width':3,transform:`translate(0,${i*26})`}));})();
+
+function ik(hx,hy,fx,fy,l1,l2){let dx=fx-hx,dy=fy-hy,d=Math.hypot(dx,dy);
+  const mx=l1+l2-.5;if(d>mx){const k=mx/d;fx=hx+dx*k;fy=hy+dy*k;d=mx;}
+  const a=Math.atan2(dy,dx),A=Math.acos(Math.max(-1,Math.min(1,(l1*l1+d*d-l2*l2)/(2*l1*d)))),ka=a-A;
+  return{kx:hx+l1*Math.cos(ka),ky:hy+l1*Math.sin(ka),fx,fy};}
+function sl(e,x1,y1,x2,y2){e.setAttribute('x1',x1);e.setAttribute('y1',y1);e.setAttribute('x2',x2);e.setAttribute('y2',y2);}
+let HIPY=HIP.y;
+function leg(th,sh,ft,ped,cr,ang,hock){
+  const fx=BB.x+CR*Math.cos(ang),fy=BB.y+CR*Math.sin(ang);
+  const s=ik(HIP.x,HIPY,fx,fy,L1,L2);
+  sl(th,HIP.x,HIPY,s.kx,s.ky);sl(sh,s.kx,s.ky,fx,fy);
+  ft.setAttribute('transform',`translate(${fx},${fy-8}) rotate(${-4+6*Math.sin(ang)})`);
+  if(ped)ped.setAttribute('transform',`translate(${fx},${fy+8})`);
+  if(cr)sl(cr,BB.x,BB.y,fx,fy);
+  if(hock){hock.setAttribute('cx',s.kx);hock.setAttribute('cy',s.ky);}
+}
+function wave(ph,amp,from,n,w){let d=`M${from.x},${from.y}`;
+  for(let i=1;i<=n;i++){const x=from.x-i*w,y=from.y+amp*Math.sin(thGlobal*2-x*0.014+ph)+(i*w*0.18);d+=` L${x.toFixed(1)},${y.toFixed(1)}`;}return d;}
+let thGlobal=0;
+function render(t){
+  const th=(t/CADENCE)*2*Math.PI;thGlobal=th;
+  const wa=th*GEAR*180/Math.PI;
+  $('wheelR').setAttribute('transform',`rotate(${wa} ${HUBR.x} ${HUBR.y})`);
+  $('wheelF').setAttribute('transform',`rotate(${wa} ${HUBF.x} ${HUBF.y})`);
+  /* 每两转一次「站起来蹬」——平滑包络，2*CADENCE 整除 DUR，循环闭合 */
+  const u=(t/(2*CADENCE))%1, lift=26*Math.pow(Math.sin(Math.PI*u),3);
+  HIPY=HIP.y-lift;
+  leg($('nThigh'),$('nShin'),$('nFoot'),$('nearPedal'),$('nearCrank'),th,$('nHock'));
+  leg($('fThigh'),$('fShin'),$('fFoot'),null,$('farCrank'),th+Math.PI);
+  $('farCrank').setAttribute('x1',BB.x);$('farCrank').setAttribute('y1',BB.y);
+
+  const bobX=6*Math.sin(th),bobY=-11*Math.sin(2*th)-lift*0.55,pitch=1.9*Math.sin(th)+lift*0.16;
+  $('rig').setAttribute('transform',`translate(${700+bobX},${580+bobY}) rotate(${pitch} 800 560) translate(-800,-560)`);
+  /* 起身时颈向前伸、囊往后甩：柔体滞后 */
+  $('headG').setAttribute('transform',`translate(${5*Math.sin(th+.5)+lift*.28},${-9*Math.sin(2*th+.4)-lift*.5})`);
+  $('neck').setAttribute('transform',`rotate(${-1.6*Math.sin(th)-lift*.06} 760,380)`);
+  $('pouchG').setAttribute('transform',`translate(${-4*Math.sin(th-1.8)},${7*Math.sin(th-2.2)}) rotate(${2.6*Math.sin(th-2.4)} 954 200)`);
+  $('scarfA').setAttribute('d',wave(0,13,{x:808,y:330},5,34));
+  $('scarfB').setAttribute('d',wave(1.3,9,{x:808,y:330},5,34));
+  $('wing').setAttribute('transform',`translate(0,${-2*Math.sin(2*th)})`);
+  /* 挡泥板抖 + 皮包晃 + 绕头苍蝇 */
+  $('fenderF').setAttribute('transform',`rotate(${1.5*Math.sin(t*37)} 1000,700)`);
+  $('satchel').setAttribute('transform',`rotate(${2.4*Math.sin(2*th-.7)} 612,652)`);
+  const f=t*2.6;const fx2=928+74*Math.cos(f)*Math.cos(f*.31),fy2=150+40*Math.sin(f*1.3);
+  $('fly').setAttribute('cx',700+(fx2-800));$('fly').setAttribute('cy',580+(fy2-560));
+  /* 逆风气流：只在起身那一拍出现 */
+  $('gust').setAttribute('opacity',(lift/26*.55).toFixed(3));
+  $('gust').setAttribute('transform',`translate(${1196+lift*1.6},${236-lift*.5}) scale(.78)`);
+  const d=t*ARC_PS;
+  TL.forEach(o=>o.g.setAttribute('transform',`translate(${-(d*o.layerSpeed)%o.w},0)`));
+}
+function tick(now){if(lastTick===null){lastTick=now;window.__ready=true;render(0);requestAnimationFrame(tick);return;}
+  const dt=(now-lastTick)/1000;lastTick=now;
+  if(playing){let t=time+dt;if(t>=DUR)t=window.__recording?DUR-.001:0;time=t;render(time);}
+  requestAnimationFrame(tick);}
+document.fonts.ready.then(()=>{ render(0); playing=true; requestAnimationFrame(tick); });
+window.__seek=t=>{time=t;render(t);};window.__pause=()=>{playing=false;};window.__duration=DUR;
+</script>
+</body>
+</html>
