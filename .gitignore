@@ -1,0 +1,217 @@
+# ============================================================
+# .gitignore —— 本仓库不入库的内容
+# 四类:1) 密钥/凭证/本地私有配置  2) 运行环境与依赖
+#       3) 构建产物/缓存/日志/临时文件  4) 编辑器与操作系统垃圾
+# ============================================================
+
+# ---------- 1. 密钥、凭证、本地私有配置(严禁上传) ----------
+# 环境变量文件:真实 key 一律只放这里
+.env
+.env.*
+.env.local
+# 屏蔽 .env.* 时放行示例/模板文件(这类文件不含真实密钥)
+!.env.example
+!.env.sample
+!.env.template
+!.env.dist
+
+# 私钥与证书
+*.key
+*.pem
+*.p12
+*.pfx
+*.jks
+*.keystore
+id_rsa
+id_rsa.*
+id_ed25519
+id_ed25519.*
+
+# 云服务 / 第三方账号凭证
+credentials
+credentials.json
+service-account*.json
+client_secret*.json
+clientid_secret.json
+.aws/
+.gcloud/
+.netrc
+*_rsa
+*.kdbx
+
+# 按目录约定存放机密
+secrets/
+secret/
+private/
+config/prod.yml
+config/prod.yaml
+config/production.*
+
+# Claude Code / AI 工具本地私有配置(共享的 .claude/settings.json 仍可入库)
+.claude/settings.local.json
+.claude/.credentials.json
+.claude/projects/
+.claude/todos/
+.claude/scheduled_tasks.json
+CLAUDE.local.md
+AGENTS.local.md
+*.local.md
+
+# ---------- 2. 运行环境与依赖 ----------
+# Node
+node_modules/
+jspm_packages/
+bower_components/
+.npm/
+.npmrc
+.pnpm/
+.node-gyp/
+.yarn-integrity
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+npm-debug.log*
+yarn-error.log
+pnpm-debug.log*
+lerna-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+*.egg-info/
+.eggs/
+pip-log.txt
+.python-version
+
+# Java / Kotlin / Maven / Gradle
+target/
+.gradle/
+*.class
+*.jar
+*.war
+*.ear
+dependency-reduced-pom.xml
+
+# Rust / Go
+**/target/
+go_build_*
+*.test
+
+# ---------- 3. 构建产物、缓存、日志、临时文件、测试与截图输出 ----------
+# 打包 / 构建产物
+dist/
+build/
+out/
+.output/
+.next/
+.nuxt/
+.vercel/
+.netlify/
+.serverless/
+.parcel-cache/
+.cache/
+.eslintcache
+.stylelintcache
+coverage/
+*.lcov
+.nyc_output/
+
+# 日志
+logs/
+log/
+*.log
+
+# 临时文件与备份
+tmp/
+temp/
+.tmp/
+*.tmp
+*.bak
+*.orig
+*.rej
+*~
+*.swp
+*.swo
+
+# 测试 / Playwright / Puppeteer 产物(本项目 _shot.cjs 会用到浏览器)
+test-results/
+test-reports/
+playwright-report/
+playwright/.cache/
+.browser/
+.pw/
+chrome-profile/
+userData/
+
+# 数据库与本地数据
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+database.yml
+
+# 压缩包 / 镜像(体积大,不入库)
+*.tgz
+*.zip
+*.7z
+*.rar
+*.dmg
+*.iso
+
+# ---------- 4. 编辑器 / IDE / 操作系统垃圾文件 ----------
+# macOS(含本仓库已跟踪的 .DS_Store,需 git rm --cached 才生效)
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.apdisk
+.AppleDB
+.AppleDesktop
+.AppleDouble
+.LSOverride
+Icon?
+com.apple.*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Linux
+.directory
+
+# IDE / 编辑器(用 .idea/* 而非 .idea/ 写法,便于按需放行共享配置)
+.idea/*
+!.idea/codeStyles/
+!.idea/inspectionProfiles/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+!.vscode/tasks.json
+*.sublime-project
+*.sublime-workspace
+.sublime-text/
+.nova/
+*.code-workspace
+.fleet/
+.netbeans/
+.project
+.classpath
+.settings/
+*.iml
+*.ipr
+*.iws
+.history/
+.vim/
+.netrwhist
